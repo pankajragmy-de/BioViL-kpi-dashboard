@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioViL Impact Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar glass-panel" id="sidebar">
+            <div class="brand">
+                <img src="biovil_logo.svg" alt="BioViL Logo" class="brand-logo">
+                <h2 class="brand-text">BioViL</h2>
+            </div>
+
+            <!-- Sidebar Toggle Button (visible on small screens) -->
+            <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle Sidebar">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item active" title="Overview">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span class="nav-label">Overview</span>
+                </a>
+                <a href="project1.html" class="nav-item" title="Project Dashboard">
+                    <i data-lucide="map-pin"></i>
+                    <span class="nav-label">Project Dashboard</span>
+                </a>
+                <a href="project1.html#environmental-tab" class="nav-item" title="Environmental">
+                    <i data-lucide="leaf"></i>
+                    <span class="nav-label">Environmental</span>
+                </a>
+                <a href="project1.html#social-tab" class="nav-item" title="Social Impact">
+                    <i data-lucide="users"></i>
+                    <span class="nav-label">Social Impact</span>
+                </a>
+                <a href="project1.html#health-tab" class="nav-item" title="System Health">
+                    <i data-lucide="activity"></i>
+                    <span class="nav-label">System Health</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="nav-label">Pioneer Phase</p>
+                <div class="status-indicator">
+                    <span class="dot pulse"></span>
+                    <span class="nav-label">Live Data System</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div>
+                    <h1 class="page-title">Impact Dashboard</h1>
+                    <p class="subtitle">Real-time monitoring of BioViL's environmental and social KPIs.</p>
+                </div>
+                    <button class="date-filter">
+                        <i data-lucide="calendar"></i>
+                        <span id="date-filter-label">Since Jan 2026</span>
+                        <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </button>
+            </header>
+
+            <!-- Hero KPI Cards (Real data from Project 1 — operational since Jan 15, 2026) -->
+            <section class="kpi-grid">
+                <div class="kpi-card glass-panel interactive-hover">
+                    <div class="kpi-icon-wrapper env-accent">
+                        <i data-lucide="cloud-off"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <p class="kpi-label">CO₂e Avoided</p>
+                        <h3 class="kpi-value"><span id="kpi-co2">1,021</span> <span class="unit">kg</span></h3>
+                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~1.02 tons cumulative</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card glass-panel interactive-hover">
+                    <div class="kpi-icon-wrapper waste-accent">
+                        <i data-lucide="recycle"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <p class="kpi-label">Waste Diverted</p>
+                        <h3 class="kpi-value"><span id="kpi-waste">1,400</span> <span class="unit">kg</span></h3>
+                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> 600 kg/mo manure</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card glass-panel interactive-hover">
+                    <div class="kpi-icon-wrapper energy-accent">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <p class="kpi-label">Biogas Produced</p>
+                        <h3 class="kpi-value"><span id="kpi-biogas">47</span> <span class="unit">m³</span></h3>
+                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~20 m³/month</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card glass-panel interactive-hover">
+                    <div class="kpi-icon-wrapper social-accent">
+                        <i data-lucide="smile"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <p class="kpi-label">Smoke-Free Hours</p>
+                        <h3 class="kpi-value"><span id="kpi-smoke">210</span> <span class="unit">hrs</span></h3>
+                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~3 hrs/day saved</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-grid">
+                <!-- Main Trend Chart -->
+                <div class="chart-card glass-panel main-chart">
+                    <div class="chart-header">
+                        <h3>Biogas Output & Waste Input</h3>
+                        <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Doughnut Chart -->
+                <div class="chart-card glass-panel side-chart">
+                    <div class="chart-header">
+                        <h3>Feedstock Composition</h3>
+                    </div>
+                    <div class="chart-container doughnut-container">
+                        <canvas id="compositionChart"></canvas>
+                    </div>
+                    <div class="chart-legend" id="compositionLegend"></div>
+                </div>
+
+                <!-- Secondary Bar Chart -->
+                <div class="chart-card glass-panel bottom-chart">
+                    <div class="chart-header">
+                        <h3>Active Biodigester Systems</h3>
+                    </div>
+                    <div class="chart-container bar-container">
+                        <canvas id="adoptionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Progress Goals Chart -->
+                <div class="chart-card glass-panel bottom-chart">
+                    <div class="chart-header">
+                        <h3>Pioneer Phase Scaling Goal</h3>
+                    </div>
+                    <div class="goal-container">
+                        <div class="circular-progress">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg"
+                                  d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                />
+                                <path class="circle"
+                                  stroke-dasharray="20, 100"
+                                  d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                />
+                                <text x="18" y="20.35" class="percentage">20%</text>
+                            </svg>
+                        </div>
+                        <div class="goal-details">
+                            <p>Target: 5 Active Systems by Year End</p>
+                            <span>Currently: 1 Biodigester (Rampur)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Initialize Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

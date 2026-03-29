@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioViL Project Dashboard - Rampur, Assam</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar glass-panel" id="sidebar">
+            <div class="brand">
+                <img src="biovil_logo.svg" alt="BioViL Logo" class="brand-logo">
+                <h2 class="brand-text">BioViL</h2>
+            </div>
+            
+            <!-- Sidebar Toggle Button (visible on small screens) -->
+            <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle Sidebar">
+                <i data-lucide="menu" id="toggle-icon"></i>
+            </button>
+
+            <nav class="nav-menu" id="sidebar-nav">
+                <a href="index.html" class="nav-item" title="Overview">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span class="nav-label">Overview</span>
+                </a>
+                <a href="#" class="nav-item active" data-tab="tracker-tab" title="Project Dashboard">
+                    <i data-lucide="map-pin"></i>
+                    <span class="nav-label">Project Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="environmental-tab" title="Environmental">
+                    <i data-lucide="leaf"></i>
+                    <span class="nav-label">Environmental</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="social-tab" title="Social Impact">
+                    <i data-lucide="users"></i>
+                    <span class="nav-label">Social Impact</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="health-tab" title="System Health">
+                    <i data-lucide="activity"></i>
+                    <span class="nav-label">System Health</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="nav-label">Status</p>
+                <div class="status-indicator">
+                    <span class="dot pulse"></span>
+                    <span class="nav-label">Active & Reporting</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div>
+                    <h1 class="page-title">Project Dashboard — Rampur, Assam</h1>
+                    <p class="subtitle">Operational Prototype #1 — Impact metrics and emission savings.</p>
+                </div>
+            </header>
+
+            <!-- COMPREHENSIVE PROJECT DETAILS HEADER (always visible) -->
+            <section class="project-summary-header glass-panel">
+                <div class="detail-item">
+                    <div class="detail-icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i data-lucide="database"></i></div>
+                    <div>
+                        <p class="detail-label">Digester Type</p>
+                        <p class="detail-value">Underground Fixed-Dome</p>
+                    </div>
+                </div>
+                <div class="detail-divider"></div>
+                <div class="detail-item">
+                    <div class="detail-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.1);"><i data-lucide="maximize"></i></div>
+                    <div>
+                        <p class="detail-label">System Size</p>
+                        <p class="detail-value">4 m³ Capacity</p>
+                    </div>
+                </div>
+                <div class="detail-divider"></div>
+                <div class="detail-item">
+                    <div class="detail-icon" style="color: #94a3b8; background: rgba(148, 163, 184, 0.1);"><i data-lucide="map"></i></div>
+                    <div>
+                        <p class="detail-label">Farm Size</p>
+                        <p class="detail-value">2 Acres (Approx.)</p>
+                    </div>
+                </div>
+                <div class="detail-divider"></div>
+                <div class="detail-item">
+                    <div class="detail-icon" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);"><i data-lucide="box"></i></div>
+                    <div>
+                        <p class="detail-label">Feedstock Input</p>
+                        <p class="detail-value">600 kg/mo Manure</p>
+                    </div>
+                </div>
+                <div class="detail-divider"></div>
+                <div class="detail-item">
+                    <div class="detail-icon" style="color: #f43f5e; background: rgba(244, 63, 94, 0.1);"><i data-lucide="flame"></i></div>
+                    <div>
+                        <p class="detail-label">Wood Replaced</p>
+                        <p class="detail-value">120 kg/mo</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB CONTAINER -->
+            <div id="tab-container">
+                
+                <!-- PROJECT TRACKER TAB (the rich default view) -->
+                <div id="tracker-tab" class="tab-content active">
+                    <!-- Hero KPI Cards -->
+                    <section class="kpi-grid">
+                        <div class="kpi-card glass-panel interactive-hover">
+                            <div class="kpi-icon-wrapper env-accent">
+                                <i data-lucide="cloud-off"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">CO₂e Avoided (Cumulative)</p>
+                                <h3 class="kpi-value"><span id="kpi-co2">1,021</span> <span class="unit">kg</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~1.02 tons (2.3 months)</p>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card glass-panel interactive-hover">
+                            <div class="kpi-icon-wrapper waste-accent">
+                                <i data-lucide="recycle"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Animal Waste Diverted</p>
+                                <h3 class="kpi-value">600 <span class="unit">kg/mo</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> 100% capacity</p>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card glass-panel interactive-hover">
+                            <div class="kpi-icon-wrapper social-accent">
+                                <i data-lucide="users"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Community Empowerment</p>
+                                <h3 class="kpi-value">4 <span class="unit">Trained</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> +5 Jobs Created</p>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card glass-panel interactive-hover">
+                            <div class="kpi-icon-wrapper energy-accent">
+                                <i data-lucide="award"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Project Milestones</p>
+                                <h3 class="kpi-value">1 <span class="unit">Registered</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="check-circle"></i> Phase 1 Completed</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Project Specs & Budget side-by-side -->
+                    <section class="profile-grid">
+                        <div class="glass-panel profile-panel">
+                            <div class="chart-header">
+                                <h3>Project Specifications</h3>
+                            </div>
+                            <ul class="specs-list">
+                                <li><strong>Location:</strong> Rampur, Assam, India</li>
+                                <li><strong>Digester Type:</strong> Underground Fixed-Dome</li>
+                                <li><strong>System Size:</strong> ~4 m³ Capacity</li>
+                                <li><strong>Feedstock:</strong> 600 kg/month (Animal Manure)</li>
+                                <li><strong>Community Operators:</strong> 4 Trained Locals</li>
+                                <li><strong>Employment Created:</strong> 5 Jobs/Experts Hired</li>
+                            </ul>
+                        </div>
+
+                        <div class="glass-panel profile-panel">
+                            <div class="chart-header">
+                                <h3>Funds Raised</h3>
+                            </div>
+                            <div class="budget-tracker">
+                                <div class="budget-stats">
+                                    <div>
+                                        <p class="kpi-label">Grant Funding</p>
+                                        <h3 class="kpi-value value-emerald">€3,000</h3>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <p class="kpi-label">Private Equity</p>
+                                        <h3 class="kpi-value value-amber">+ €600</h3>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill emerald-bg" style="width: 100%;"></div>
+                                </div>
+                                <p class="budget-note">100% of grant funding deployed for infrastructure (bricks, cement, excavation), domain/design, and labor. €600 private equity co-financed to complete the project.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Quick Charts on Tracker Tab -->
+                    <section class="charts-grid">
+                        <div class="chart-card glass-panel main-chart">
+                            <div class="chart-header">
+                                <h3>Emissions: Baseline vs. BioViL</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="trackerEmissionsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card glass-panel side-chart">
+                            <div class="chart-header">
+                                <h3>Sources of Avoided Emissions</h3>
+                            </div>
+                            <div class="chart-container doughnut-container">
+                                <canvas id="trackerSourceChart"></canvas>
+                            </div>
+                            <div class="chart-legend" id="trackerSourceLegend"></div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ENVIRONMENTAL TAB -->
+                <div id="environmental-tab" class="tab-content">
+                    <section class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2rem;">
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper env-accent">
+                                <i data-lucide="wind"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Total Monthly Offset</p>
+                                <h3 class="kpi-value">438.1 <span class="unit">kg CO₂e</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Waste 218 + Wood 220.1</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper waste-accent">
+                                <i data-lucide="cloud-rain"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Methane Capture (Waste)</p>
+                                <h3 class="kpi-value">218 <span class="unit">kg CO₂e/mo</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="check-circle"></i> 600 kg manure digested</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper energy-accent">
+                                <i data-lucide="tree-pine"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Firewood Displacement</p>
+                                <h3 class="kpi-value">220.1 <span class="unit">kg CO₂e/mo</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="check-circle"></i> 120 kg wood replaced</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="charts-grid" style="margin-bottom: 2rem;">
+                        <div class="chart-card glass-panel main-chart">
+                            <div class="chart-header">
+                                <h3>Monthly Emissions: Baseline vs. Active BioViL</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="emissionsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card glass-panel side-chart">
+                            <div class="chart-header">
+                                <h3>Sources of Avoided Emissions</h3>
+                            </div>
+                            <div class="chart-container doughnut-container">
+                                <canvas id="sourceChart"></canvas>
+                            </div>
+                            <div class="chart-legend" id="sourceLegend"></div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- SOCIAL TAB -->
+                <div id="social-tab" class="tab-content">
+                    <section class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2rem;">
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper social-accent">
+                                <i data-lucide="briefcase"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Jobs Created</p>
+                                <h3 class="kpi-value">5 <span class="unit">Experts</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Target 1 → Achieved 5</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper env-accent">
+                                <i data-lucide="graduation-cap"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Operators Trained</p>
+                                <h3 class="kpi-value">4 <span class="unit">Locals</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Target 2 → 200%</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper energy-accent">
+                                <i data-lucide="building"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Company Registered</p>
+                                <h3 class="kpi-value">1 <span class="unit">Organization</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="check-circle"></i> Completed</p>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="profile-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="glass-panel profile-panel">
+                            <div class="chart-header">
+                                <h3>Community Capacity Building</h3>
+                            </div>
+                            <ul class="specs-list" style="margin-top: 1.5rem; gap: 1.5rem;">
+                                <li><strong>Jobs Created:</strong> 5 Local Experts Hired for Construction</li>
+                                <li><strong>Operators Trained:</strong> 4 Community Members (Target was 2)</li>
+                                <li><strong>Project Goal:</strong> Co. Registration successfully completed.</li>
+                                <li><strong>Awareness:</strong> Community workshops held before operation.</li>
+                            </ul>
+                        </div>
+                        <div class="glass-panel profile-panel">
+                            <div class="chart-header">
+                                <h3>Budget Utilization (€3,000 Grant)</h3>
+                            </div>
+                            <div class="chart-container doughnut-container" style="height: 250px;">
+                                <canvas id="budgetChart"></canvas>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- SYSTEM HEALTH TAB -->
+                <div id="health-tab" class="tab-content">
+                    <section class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="kpi-card glass-panel">
+                            <div class="kpi-icon-wrapper env-accent">
+                                <i data-lucide="zap"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Operational Status</p>
+                                <h3 class="kpi-value" style="color: var(--accent-env);">Active</h3>
+                                <p class="kpi-trend positive">Since January 15, 2026</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel" style="opacity: 0.6;">
+                            <div class="kpi-icon-wrapper waste-accent">
+                                <i data-lucide="thermometer"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Internal Temperature</p>
+                                <h3 class="kpi-value">-- <span class="unit">°C</span></h3>
+                                <p class="kpi-trend">Awaiting IoT Sensor</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel" style="opacity: 0.6;">
+                            <div class="kpi-icon-wrapper energy-accent">
+                                <i data-lucide="gauge"></i>
+                            </div>
+                            <div class="kpi-details">
+                                <p class="kpi-label">Biogas Pressure</p>
+                                <h3 class="kpi-value">-- <span class="unit">kPa</span></h3>
+                                <p class="kpi-trend">Awaiting IoT Sensor</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+            </div> <!-- End Tab Container -->
+        </main>
+    </div>
+
+    <!-- Initialize Scripts -->
+    <script src="project1.js"></script>
+</body>
+</html>
