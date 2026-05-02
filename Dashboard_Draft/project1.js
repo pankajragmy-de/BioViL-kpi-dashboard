@@ -1,140 +1,198 @@
 // Initialize Icons
 lucide.createIcons();
 
-// --- DYNAMIC DATA GENERATION: ASSAM CLIMATE & TIME PROGRESSION ---
+// ─── ISO Week Number ──────────────────────────────────────────────────────────
+function getISOWeek(d) {
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+// ─── Seeded pseudo-random (must match script.js) ──────────────────────────────
 function pseudoRandom(seed) {
     let x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
 }
 
+// ─── Generate project data (mirrors script.js exactly) ───────────────────────
 function generateProjectData() {
     const startDate = new Date(2026, 0, 15);
     const currentDate = new Date();
     const yieldCurve = [0.016, 0.018, 0.026, 0.030, 0.033, 0.035, 0.035, 0.034, 0.032, 0.028, 0.022, 0.017];
-    
-    let totalWaste = 0;
+
+    let labels = [], wasteData = [], biogasData = [];
+    let totalWaste = 0, totalBiogas = 0;
     let dateCursor = new Date(startDate);
     let weekIndex = 0;
+
     while (dateCursor <= currentDate) {
-        let baseWaste = (weekIndex === 0) ? 70 : 140;
-        let fluctuation = 1.0 + (pseudoRandom(weekIndex * 123.45) * 0.3 - 0.15); 
-        totalWaste += Math.round(baseWaste * fluctuation);
+        const month = dateCursor.getMonth();
+        const shortMonth = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(dateCursor);
+        labels.push(`W${getISOWeek(dateCursor)} ${shortMonth}`);
+
+        const baseWaste = weekIndex === 0 ? 70 : 140;
+        const weeklyWaste = Math.round(baseWaste * (1.0 + pseudoRandom(weekIndex * 123.45) * 0.3 - 0.15));
+        const weeklyBiogas = Number((weeklyWaste * yieldCurve[month] * (1.0 + pseudoRandom(weekIndex * 678.9) * 0.1 - 0.05)).toFixed(1));
+
+        wasteData.push(weeklyWaste);
+        biogasData.push(weeklyBiogas);
+        totalWaste += weeklyWaste;
+        totalBiogas += weeklyBiogas;
         dateCursor.setDate(dateCursor.getDate() + 7);
         weekIndex++;
     }
-    
-    let totalCO2e = Math.round(totalWaste * 0.73);
-    return { totalCO2e };
+
+    const elapsedMonths = Math.max(0.5, (new Date() - startDate) / (1000 * 60 * 60 * 24 * 30.44));
+    const daysActive = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+
+    return {
+        labels, wasteData, biogasData,
+        totalWaste, totalBiogas: Math.round(totalBiogas),
+        totalCO2e: Math.round(totalWaste * 0.73),
+        totalSmokeFree: weekIndex * 21,
+        totalBioslurry: Math.round(totalWaste * 0.85),
+        monthlyBiogasAvg: Math.round(totalBiogas / elapsedMonths),
+        elapsedMonths, daysActive, weekCount: weekIndex
+    };
 }
 
 const pData = generateProjectData();
 
-// Wait for DOM to load before updating elements
-document.addEventListener("DOMContentLoaded", function() {
-    const co2Element = document.getElementById('kpi-co2');
-    if (co2Element) {
-        co2Element.textContent = pData.totalCO2e.toLocaleString();
+// ─── Count-Up Animation ───────────────────────────────────────────────────────
+function animateCountUp(el, target, duration = 1400) {
+    if (!el) return;
+    const startTime = performance.now();
+    function tick(now) {
+        const ease = 1 - Math.pow(1 - Math.min((now - startTime) / duration, 1), 3);
+        el.textContent = Math.round(target * ease).toLocaleString();
+        if (ease < 1) requestAnimationFrame(tick);
     }
-});
+    requestAnimationFrame(tick);
+}
 
-// Chart Defaults
+// ─── Chart Defaults ───────────────────────────────────────────────────────────
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.font.family = "'Outfit', sans-serif";
 Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
 
-// Chart instance holders
 let charts = {};
 
-// ─── Chart factory helpers ───
-function createBarChart(canvasId, storeKey) {
-    const ctx = document.getElementById(canvasId)?.getContext('2d');
-    if (!ctx) return;
-    if (charts[storeKey]) charts[storeKey].destroy();
+// ─── Radial Gauge (SVG half-circle) ─────────────────────────────────────────
+// Renders an animated half-circle gauge showing % of annual GHGe target avoided.
+function renderGauge(trackId, fillId, pctId, avoidedId, remainingId) {
+    const ANNUAL_TARGET = 5260;
+    const cx = 130, cy = 148, r = 105;
 
-    charts[storeKey] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Baseline (Before BioViL)', 'Current (With BioViL)'],
-            datasets: [
-                {
-                    label: 'GHG from Rotting Waste (kg CO₂e)',
-                    data: [218, 0],
-                    backgroundColor: '#fbbf24',
-                    borderRadius: 6,
-                    barThickness: 50
-                },
-                {
-                    label: 'GHG from Wood Burning (kg CO₂e)',
-                    data: [220.1, 0],
-                    backgroundColor: '#f87171',
-                    borderRadius: 6,
-                    barThickness: 50
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
-                tooltip: { backgroundColor: 'rgba(18,25,33,0.9)', padding: 12, cornerRadius: 8 }
-            },
-            scales: {
-                x: { stacked: true, grid: { display: false } },
-                y: { stacked: true, beginAtZero: true, grid: { drawBorder: false }, title: { display: true, text: 'kg CO₂e per month' } }
-            }
-        }
+    // Compute net avoided from live data
+    const BASELINE_WEEKLY = 438.1 / 4.33;
+    let bBase = 0, bBioVil = 0;
+    pData.wasteData.forEach((_, i) => {
+        bBase   += BASELINE_WEEKLY;
+        bBioVil += pData.biogasData[i] * 1.2;
     });
+    const netAvoided = Math.round(bBase - bBioVil);
+    const pct = Math.min(netAvoided / ANNUAL_TARGET, 1);
+    const remaining = Math.max(0, ANNUAL_TARGET - netAvoided);
+
+    function polarToXY(angle) {
+        return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+    }
+    function arcD(from, to) {
+        const [x1, y1] = polarToXY(from);
+        const [x2, y2] = polarToXY(to);
+        const large = (to - from) > Math.PI ? 1 : 0;
+        return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+    }
+
+    const trackEl = document.getElementById(trackId);
+    const fillEl  = document.getElementById(fillId);
+    const pctEl   = document.getElementById(pctId);
+
+    if (!trackEl || !fillEl || !pctEl) return;
+
+    const fullArc  = arcD(-Math.PI, 0);
+    trackEl.setAttribute('d', fullArc);
+    fillEl.setAttribute('d', fullArc); // same path; we clip via dasharray
+
+    // Total arc length for a semicircle
+    const arcLen = Math.PI * r;
+    fillEl.setAttribute('stroke-dasharray', `0 ${arcLen}`);
+    fillEl.setAttribute('stroke-dashoffset', '0');
+
+    // Animate
+    setTimeout(() => {
+        fillEl.style.transition = 'stroke-dasharray 1.6s cubic-bezier(0.4,0,0.2,1)';
+        fillEl.setAttribute('stroke-dasharray', `${pct * arcLen} ${arcLen}`);
+        // Animate % text
+        const start = performance.now();
+        function tick(now) {
+            const ease = 1 - Math.pow(1 - Math.min((now - start) / 1600, 1), 3);
+            pctEl.textContent = Math.round(ease * pct * 100) + '%';
+            if (ease < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }, 120);
+
+    if (avoidedId) {
+        const el = document.getElementById(avoidedId);
+        if (el) el.textContent = netAvoided.toLocaleString() + ' kg CO₂e';
+    }
+    if (remainingId) {
+        const el = document.getElementById(remainingId);
+        if (el) el.textContent = remaining.toLocaleString() + ' kg CO₂e';
+    }
 }
 
-function createDoughnutChart(canvasId, storeKey, legendId) {
+// ─── Avoided Emissions Doughnut ────────────────────────────────────────────────
+function createSourceDoughnut(canvasId, storeKey, legendId) {
     const ctx = document.getElementById(canvasId)?.getContext('2d');
     if (!ctx) return;
     if (charts[storeKey]) charts[storeKey].destroy();
 
-    const data = [218, 220.1];
+    // Cumulative values scaled to time elapsed
+    const months = Math.max(0.5, (new Date() - new Date(2026, 0, 15)) / (1000 * 60 * 60 * 24 * 30.44));
+    const methane  = Math.round(218 * months);
+    const firewood = Math.round(220.1 * months);
+    const data   = [methane, firewood];
     const labels = ['Avoided Methane (Waste)', 'Avoided CO₂ (Firewood)'];
     const colors = ['#fbbf24', '#38bdf8'];
 
     charts[storeKey] = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }] },
+        data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }] },
         options: {
-            responsive: true, maintainAspectRatio: false, cutout: '75%',
+            responsive: true, maintainAspectRatio: false, cutout: '74%',
             plugins: {
                 legend: { display: false },
-                tooltip: { backgroundColor: 'rgba(18,25,33,0.9)', padding: 12, cornerRadius: 8,
-                    callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + ' kg CO₂e' } }
+                tooltip: {
+                    backgroundColor: 'rgba(10,14,18,0.95)', padding: 12, cornerRadius: 10,
+                    borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1,
+                    callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()} kg CO₂e` }
+                }
             }
         }
     });
 
-    // Build custom legend
     if (legendId) {
         const container = document.getElementById(legendId);
         if (container && container.innerHTML === '') {
             labels.forEach((label, i) => {
                 const item = document.createElement('div');
                 item.className = 'legend-item';
-                item.innerHTML = `<div class="legend-label"><span class="legend-color" style="background-color: ${colors[i]}"></span>${label}</div><div class="legend-value">${data[i]} kg/mo</div>`;
+                item.innerHTML = `<div class="legend-label"><span class="legend-color" style="background:${colors[i]}"></span>${label}</div><div class="legend-value">${data[i].toLocaleString()} kg</div>`;
                 container.appendChild(item);
             });
         }
     }
 }
 
+// ─── Budget Chart ─────────────────────────────────────────────────────────────
 function initBudgetChart() {
     const ctx = document.getElementById('budgetChart')?.getContext('2d');
     if (!ctx) return;
     if (charts.budget) charts.budget.destroy();
 
-    // Verified from "03. Budget Overview - 7647.xlsx"
-    // Materials, Supplies & Equipment: €174 + €1,048 + €267 + €70 = €1,559
-    // Infrastructure (laptop, web dev, logo): €672 + €200 + €80 = €952
-    // Professional Services & Vendors: €183 + €120.35 = €303.35
-    // Operational Expenses (transport): €115
-    // Software & Licenses (domain): €70.65
-    // TOTAL: €3,000.00
     charts.budget = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -142,53 +200,61 @@ function initBudgetChart() {
             datasets: [{
                 data: [1559, 952, 303.35, 115, 70.65],
                 backgroundColor: ['#10b981', '#3b82f6', '#fbbf24', '#f87171', '#a78bfa'],
-                borderWidth: 0, hoverOffset: 4
+                borderWidth: 0, hoverOffset: 6
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: '70%',
             plugins: {
-                legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, color: '#94a3b8', font: { size: 11 } } },
+                legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, color: '#94a3b8', font: { size: 11 }, padding: 12 } },
                 tooltip: {
-                    backgroundColor: 'rgba(18,25,33,0.9)', padding: 12, cornerRadius: 8,
-                    callbacks: { label: ctx => ' ' + ctx.label + ': €' + ctx.raw.toFixed(2) }
+                    backgroundColor: 'rgba(10,14,18,0.95)', padding: 12, cornerRadius: 10,
+                    borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1,
+                    callbacks: { label: ctx => ` ${ctx.label}: €${ctx.raw.toFixed(2)}` }
                 }
             }
         }
     });
 }
 
-// ─── Re-init charts for a given tab ───
+// ─── Init charts per tab ──────────────────────────────────────────────────────
 function initChartsForTab(tabId) {
     if (tabId === 'tracker-tab') {
-        createBarChart('trackerEmissionsChart', 'trackerBar');
-        createDoughnutChart('trackerSourceChart', 'trackerDoughnut', 'trackerSourceLegend');
+        renderGauge('tGaugeTrack', 'tGaugeFill', 'tGaugePct', 'tGaugeAvoided', 'tGaugeRemaining');
+        createSourceDoughnut('trackerSourceChart', 'trackerDoughnut', 'trackerSourceLegend');
     } else if (tabId === 'environmental-tab') {
-        createBarChart('emissionsChart', 'envBar');
-        createDoughnutChart('sourceChart', 'envDoughnut', 'sourceLegend');
+        renderGauge('eGaugeTrack', 'eGaugeFill', 'eGaugePct', 'eGaugeAvoided', 'eGaugeRemaining');
+        createSourceDoughnut('sourceChart', 'envDoughnut', 'sourceLegend');
     } else if (tabId === 'social-tab') {
         initBudgetChart();
     }
 }
 
-// ─── Tab Navigation ───
+// ─── Tab Navigation ───────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Wire live KPIs to pData (all tabs)
+    animateCountUp(document.getElementById('kpi-co2'), pData.totalCO2e);
+    animateCountUp(document.getElementById('kpi-bioslurry-proj'), pData.totalBioslurry);
+
+    // Environmental tab KPIs (cumulative, not static monthly rates)
+    animateCountUp(document.getElementById('env-total-offset'), pData.totalCO2e);
+    const envBiogasTrend = document.getElementById('env-biogas-trend');
+    if (envBiogasTrend) envBiogasTrend.textContent = `${pData.monthlyBiogasAvg} m³/month avg.`;
+
     const navItems = document.querySelectorAll('.nav-item[data-tab]');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // Init default tab charts
+    // Init default tab
     initChartsForTab('tracker-tab');
 
-    // ─── URL Hash Routing (for cross-page navigation from index.html) ───
+    // URL hash routing
     const hash = window.location.hash.replace('#', '');
     if (hash) {
-        const targetNavItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
-        if (targetNavItem) {
-            // Deactivate all
+        const target = document.querySelector(`.nav-item[data-tab="${hash}"]`);
+        if (target) {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            tabContents.forEach(tab => tab.classList.remove('active'));
-            // Activate target
-            targetNavItem.classList.add('active');
+            tabContents.forEach(t => t.classList.remove('active'));
+            target.classList.add('active');
             const targetTab = document.getElementById(hash);
             if (targetTab) {
                 targetTab.classList.add('active');
@@ -200,31 +266,45 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
-
-            // Deactivate ALL nav items (including Overview link)
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            tabContents.forEach(tab => tab.classList.remove('active'));
-
-            // Activate clicked
+            tabContents.forEach(t => t.classList.remove('active'));
             item.classList.add('active');
             const targetId = item.getAttribute('data-tab');
             const targetTab = document.getElementById(targetId);
             if (targetTab) {
                 targetTab.classList.add('active');
-                // Small delay to let the DOM repaint before rendering charts
                 setTimeout(() => initChartsForTab(targetId), 50);
             }
         });
     });
 
-    // ─── Sidebar Collapse/Expand Toggle ───
+    // Sidebar toggle
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-toggle');
-
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('expanded');
             lucide.createIcons();
         });
     }
+
+    // ─── Auto-Refresh (every 60 s) ────────────────────────────────────────────
+    setInterval(() => {
+        // Regenerate data (adds new weeks as real time passes)
+        const d = generateProjectData();
+        Object.assign(pData, d);
+
+        // Update KPI text
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = Math.round(v).toLocaleString(); };
+        set('kpi-co2', d.totalCO2e);
+        set('kpi-bioslurry-proj', d.totalBioslurry);
+        set('env-total-offset', d.totalCO2e);
+
+        const bt = document.getElementById('env-biogas-trend');
+        if (bt) bt.textContent = `${d.monthlyBiogasAvg} m³/month avg.`;
+
+        // Re-render gauge + doughnut on active tab
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab) initChartsForTab(activeTab.id);
+    }, 60000);
 });

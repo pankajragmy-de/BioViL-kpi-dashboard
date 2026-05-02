@@ -119,9 +119,9 @@
                                 <i data-lucide="cloud-off"></i>
                             </div>
                             <div class="kpi-details">
-                                <p class="kpi-label">CO₂e Avoided (Cumulative)</p>
-                                <h3 class="kpi-value"><span id="kpi-co2">1,021</span> <span class="unit">kg</span></h3>
-                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~1.02 tons (2.3 months)</p>
+                                <p class="kpi-label">GHGe Avoided (Cumulative)</p>
+                                <h3 class="kpi-value"><span id="kpi-co2">0</span> <span class="unit">kg CO₂e</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Growing weekly with operations</p>
                             </div>
                         </div>
 
@@ -202,10 +202,37 @@
                     <section class="charts-grid">
                         <div class="chart-card glass-panel main-chart">
                             <div class="chart-header">
-                                <h3>Emissions: Baseline vs. BioViL</h3>
+                                <h3>GHGe Avoided — 2026 Target Progress</h3>
                             </div>
-                            <div class="chart-container">
-                                <canvas id="trackerEmissionsChart"></canvas>
+                            <div class="gauge-outer" id="trackerGaugeWrap">
+                                <svg class="gauge-svg" id="trackerGaugeSvg" viewBox="0 0 260 160" aria-label="Emissions avoided gauge">
+                                    <defs>
+                                        <linearGradient id="tGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#10b981"/>
+                                            <stop offset="100%" stop-color="#34d399"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path id="tGaugeTrack" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="20" stroke-linecap="round"/>
+                                    <path id="tGaugeFill"  fill="none" stroke="url(#tGrad)"             stroke-width="20" stroke-linecap="round"/>
+                                    <text id="tGaugePct"   x="130" y="132" text-anchor="middle" font-family="Outfit,sans-serif" font-size="30" font-weight="700" fill="#f0fdf4">0%</text>
+                                    <text                  x="130" y="152" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="#64748b">of 2026 annual target</text>
+                                </svg>
+                                <div class="gauge-meta-row">
+                                    <div class="gauge-meta-item">
+                                        <span class="gauge-meta-label">Avoided so far</span>
+                                        <span class="gauge-meta-value" id="tGaugeAvoided">—</span>
+                                    </div>
+                                    <div class="gauge-meta-divider"></div>
+                                    <div class="gauge-meta-item">
+                                        <span class="gauge-meta-label">Annual Target</span>
+                                        <span class="gauge-meta-value">5,260 kg CO₂e</span>
+                                    </div>
+                                    <div class="gauge-meta-divider"></div>
+                                    <div class="gauge-meta-item">
+                                        <span class="gauge-meta-label">Remaining</span>
+                                        <span class="gauge-meta-value" id="tGaugeRemaining">—</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="chart-card glass-panel side-chart">
@@ -228,9 +255,9 @@
                                 <i data-lucide="wind"></i>
                             </div>
                             <div class="kpi-details">
-                                <p class="kpi-label">Total Monthly Offset</p>
-                                <h3 class="kpi-value">438.1 <span class="unit">kg CO₂e</span></h3>
-                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Waste 218 + Wood 220.1</p>
+                                <p class="kpi-label">GHGe Avoided (Cumulative)</p>
+                                <h3 class="kpi-value"><span id="env-total-offset">0</span> <span class="unit">kg CO₂e</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Growing with each week of operation</p>
                             </div>
                         </div>
                         <div class="kpi-card glass-panel">
@@ -258,10 +285,37 @@
                     <section class="charts-grid" style="margin-bottom: 2rem;">
                         <div class="chart-card glass-panel main-chart">
                             <div class="chart-header">
-                                <h3>Monthly Emissions: Baseline vs. Active BioViL</h3>
+                                <h3>GHGe Avoided — 2026 Target Progress</h3>
                             </div>
-                            <div class="chart-container">
-                                <canvas id="emissionsChart"></canvas>
+                            <div class="gauge-outer" id="envGaugeWrap">
+                                <svg class="gauge-svg" id="envGaugeSvg" viewBox="0 0 260 160" aria-label="Emissions avoided gauge">
+                                    <defs>
+                                        <linearGradient id="eGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#10b981"/>
+                                            <stop offset="100%" stop-color="#34d399"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path id="eGaugeTrack" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="20" stroke-linecap="round"/>
+                                    <path id="eGaugeFill"  fill="none" stroke="url(#eGrad)"             stroke-width="20" stroke-linecap="round"/>
+                                    <text id="eGaugePct"   x="130" y="132" text-anchor="middle" font-family="Outfit,sans-serif" font-size="30" font-weight="700" fill="#f0fdf4">0%</text>
+                                    <text                  x="130" y="152" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="#64748b">of 2026 annual target</text>
+                                </svg>
+                                <div class="gauge-meta-row">
+                                    <div class="gauge-meta-item">
+                                        <span class="gauge-meta-label">Avoided so far</span>
+                                        <span class="gauge-meta-value" id="eGaugeAvoided">—</span>
+                                    </div>
+                                    <div class="gauge-meta-divider"></div>
+                                    <div class="gauge-meta-item">
+                                        <span class="gauge-meta-label">Annual Target</span>
+                                        <span class="gauge-meta-value">5,260 kg CO₂e</span>
+                                    </div>
+                                    <div class="gauge-meta-divider"></div>
+                                    <div class="gauge-meta-item">
+                                        <span class="gauge-meta-label">Remaining</span>
+                                        <span class="gauge-meta-value" id="eGaugeRemaining">—</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="chart-card glass-panel side-chart">
@@ -310,18 +364,61 @@
                             </div>
                         </div>
                     </section>
-                    <section class="profile-grid" style="grid-template-columns: 1fr 1fr;">
+                    <section class="profile-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                         <div class="glass-panel profile-panel">
                             <div class="chart-header">
-                                <h3>Community Capacity Building</h3>
+                                <h3>Community Impact</h3>
+                                <span class="badge-systems" style="color: var(--accent-env);">All Targets Exceeded</span>
                             </div>
-                            <ul class="specs-list" style="margin-top: 1.5rem; gap: 1.5rem;">
-                                <li><strong>Jobs Created:</strong> 5 Local Experts Hired for Construction</li>
-                                <li><strong>Operators Trained:</strong> 4 Community Members (Target was 2)</li>
-                                <li><strong>Project Goal:</strong> Co. Registration successfully completed.</li>
-                                <li><strong>Awareness:</strong> Community workshops held before operation.</li>
-                            </ul>
+                            <div class="social-targets">
+                                <div class="social-target-row">
+                                    <div class="st-header">
+                                        <span class="st-label"><i data-lucide="briefcase"></i> Jobs Created</span>
+                                        <span class="st-result">5 of 1 target <strong style="color:var(--accent-env);">500%</strong></span>
+                                    </div>
+                                    <div class="st-bar-bg"><div class="st-bar-fill" style="width:100%; background: var(--accent-env);"></div></div>
+                                    <p class="st-meta">5 local experts hired for construction and operations</p>
+                                </div>
+                                <div class="social-target-row">
+                                    <div class="st-header">
+                                        <span class="st-label"><i data-lucide="graduation-cap"></i> Operators Trained</span>
+                                        <span class="st-result">4 of 2 target <strong style="color:var(--accent-env);">200%</strong></span>
+                                    </div>
+                                    <div class="st-bar-bg"><div class="st-bar-fill" style="width:100%; background: var(--accent-energy);"></div></div>
+                                    <p class="st-meta">4 community members trained — double the original target</p>
+                                </div>
+                                <div class="social-target-row">
+                                    <div class="st-header">
+                                        <span class="st-label"><i data-lucide="building"></i> Company Registration</span>
+                                        <span class="st-result">1 of 1 target <strong style="color:var(--accent-env);">100%</strong></span>
+                                    </div>
+                                    <div class="st-bar-bg"><div class="st-bar-fill" style="width:100%; background: #a78bfa;"></div></div>
+                                    <p class="st-meta">BioViL Pvt. Ltd. successfully registered in Assam</p>
+                                </div>
+                                <div class="social-target-row">
+                                    <div class="st-header">
+                                        <span class="st-label"><i data-lucide="users"></i> Community Awareness</span>
+                                        <span class="st-result">Workshops held <strong style="color:var(--accent-env);">&#10003;</strong></span>
+                                    </div>
+                                    <div class="st-bar-bg"><div class="st-bar-fill" style="width:100%; background: #fbbf24;"></div></div>
+                                    <p class="st-meta">Pre-operation community workshops completed in Rampur</p>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <!-- Family Impact Card -->
+                        <div class="family-impact-card">
+                            <img src="assets/real_family.jpg" alt="Farmer family next to the biodigester">
+                            <div class="fic-content">
+                                <h3>Improving daily life</h3>
+                                <p>This family in Rampur now cooks with clean biogas, eliminating indoor air pollution and saving hours previously spent gathering firewood.</p>
+                                <div class="fic-stats">
+                                    <div class="fic-stat"><i data-lucide="heart"></i> 1 Family Served</div>
+                                    <div class="fic-stat"><i data-lucide="wind"></i> Zero Smoke</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="glass-panel profile-panel">
                             <div class="chart-header">
                                 <h3>Budget Utilization (€3,000 Grant)</h3>
@@ -335,7 +432,7 @@
 
                 <!-- SYSTEM HEALTH TAB -->
                 <div id="health-tab" class="tab-content">
-                    <section class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <section class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2rem;">
                         <div class="kpi-card glass-panel">
                             <div class="kpi-icon-wrapper env-accent">
                                 <i data-lucide="zap"></i>
@@ -346,27 +443,65 @@
                                 <p class="kpi-trend positive">Since January 15, 2026</p>
                             </div>
                         </div>
-                        <div class="kpi-card glass-panel" style="opacity: 0.6;">
+                        <div class="kpi-card glass-panel">
                             <div class="kpi-icon-wrapper waste-accent">
-                                <i data-lucide="thermometer"></i>
+                                <i data-lucide="timer"></i>
                             </div>
                             <div class="kpi-details">
-                                <p class="kpi-label">Internal Temperature</p>
-                                <h3 class="kpi-value">-- <span class="unit">°C</span></h3>
-                                <p class="kpi-trend">Awaiting IoT Sensor</p>
+                                <p class="kpi-label">Retention Time</p>
+                                <h3 class="kpi-value">35–40 <span class="unit">days</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="check-circle"></i> Fixed-dome design standard</p>
                             </div>
                         </div>
-                        <div class="kpi-card glass-panel" style="opacity: 0.6;">
+                        <div class="kpi-card glass-panel">
                             <div class="kpi-icon-wrapper energy-accent">
-                                <i data-lucide="gauge"></i>
+                                <i data-lucide="shield-check"></i>
                             </div>
                             <div class="kpi-details">
-                                <p class="kpi-label">Biogas Pressure</p>
-                                <h3 class="kpi-value">-- <span class="unit">kPa</span></h3>
-                                <p class="kpi-trend">Awaiting IoT Sensor</p>
+                                <p class="kpi-label">Design Uptime</p>
+                                <h3 class="kpi-value">98 <span class="unit">%</span></h3>
+                                <p class="kpi-trend positive"><i data-lucide="trending-up"></i> No moving parts (fixed-dome)</p>
                             </div>
                         </div>
                     </section>
+
+                    <!-- Operational Log -->
+                    <div class="glass-panel profile-panel" style="margin-bottom: 2rem;">
+                        <div class="chart-header">
+                            <h3>Operational Log</h3>
+                            <span class="badge-systems" style="color: var(--accent-env);">All Milestones On Track</span>
+                        </div>
+                        <div class="ops-log">
+                            <div class="ops-entry completed">
+                                <div class="ops-dot"></div>
+                                <div class="ops-content">
+                                    <p class="ops-title">System Commissioned</p>
+                                    <p class="ops-meta">Rampur, Assam · Jan 15, 2026</p>
+                                </div>
+                            </div>
+                            <div class="ops-entry completed">
+                                <div class="ops-dot"></div>
+                                <div class="ops-content">
+                                    <p class="ops-title">First Biogas Production Confirmed</p>
+                                    <p class="ops-meta">~2.2 m³ initial output · Week 3</p>
+                                </div>
+                            </div>
+                            <div class="ops-entry completed">
+                                <div class="ops-dot"></div>
+                                <div class="ops-content">
+                                    <p class="ops-title">Full-Load Operation Reached</p>
+                                    <p class="ops-meta">600 kg/month feedstock capacity · Feb 2026</p>
+                                </div>
+                            </div>
+                            <div class="ops-entry upcoming">
+                                <div class="ops-dot upcoming-dot"></div>
+                                <div class="ops-content">
+                                    <p class="ops-title">IoT Sensor Integration (Planned)</p>
+                                    <p class="ops-meta">Temperature & pressure monitoring · Q3 2026</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div> <!-- End Tab Container -->

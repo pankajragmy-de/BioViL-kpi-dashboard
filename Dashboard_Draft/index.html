@@ -4,28 +4,254 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BioViL Impact Dashboard</title>
+    <meta name="description" content="Real-time KPI dashboard tracking BioViL's environmental and social impact in Rampur, Assam.">
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        /* ── Overview-specific extras ───────────────────────────────────── */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(56,189,248,0.08) 60%, rgba(10,14,20,0) 100%);
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 18px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .hero-text h2 {
+            font-size: 1.5rem; font-weight: 700;
+            background: linear-gradient(135deg, #34d399, #38bdf8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .hero-text p { color: #64748b; font-size: 0.875rem; max-width: 480px; line-height: 1.6; }
+
+        .hero-stats {
+            display: flex; gap: 20px; flex-wrap: wrap;
+        }
+        .hero-stat {
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 14px 22px;
+            min-width: 110px;
+        }
+        .hero-stat .h-val {
+            font-size: 1.5rem; font-weight: 700;
+            color: #10b981; display: block; line-height: 1;
+        }
+        .hero-stat .h-lbl { font-size: 0.72rem; color: #64748b; margin-top: 6px; display: block; text-transform: uppercase; letter-spacing: 0.06em; }
+
+        /* Impact summary row */
+        .impact-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .impact-tile {
+            background: #0f1923;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 18px 18px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.2s;
+            cursor: default;
+        }
+        .impact-tile:hover { border-color: rgba(16,185,129,0.3); }
+        .impact-tile .it-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .impact-tile .it-icon i { width: 20px; height: 20px; }
+        .impact-tile .it-val {
+            font-size: 1.35rem; font-weight: 700; color: #f0f9ff; line-height: 1;
+        }
+        .impact-tile .it-unit { font-size: 0.75rem; color: #64748b; font-weight: 400; }
+        .impact-tile .it-lbl { font-size: 0.78rem; color: #64748b; }
+        .impact-tile .it-trend {
+            font-size: 0.72rem; color: #10b981;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .impact-tile .it-trend i { width: 12px; height: 12px; }
+
+        /* Charts two-col */
+        .overview-charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+            align-items: stretch;
+        }
+        .chart-box {
+            background: #0f1923;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 22px 22px 18px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-box h3 {
+            font-size: 0.95rem; font-weight: 600; color: #e2e8f0;
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+            flex-shrink: 0;
+        }
+        .chart-box h3 .download-btn {
+            margin-left: auto;
+            background: none; border: none; cursor: pointer;
+            color: #475569; transition: color 0.2s;
+        }
+        .chart-box h3 .download-btn:hover { color: #94a3b8; }
+        .chart-box h3 .download-btn i { width: 16px; height: 16px; }
+        .chart-canvas-wrap { position: relative; height: 280px; flex-shrink: 0; }
+        .chart-canvas-wrap.tall { flex: 1; height: auto; min-height: 140px; display: flex; align-items: center; }
+        .chart-canvas-wrap.tall canvas { width: 100%; height: 100%; }
+
+        /* Progress bar row */
+        .target-progress {
+            margin-top: 16px;
+            background: rgba(16,185,129,0.06);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+        .tp-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .tp-title { font-size: 0.8rem; color: #94a3b8; }
+        .tp-val { font-size: 0.85rem; font-weight: 700; color: #10b981; }
+        .tp-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+        .tp-fill { height: 100%; background: linear-gradient(90deg,#10b981,#34d399); border-radius: 4px; transition: width 1.4s cubic-bezier(0.4,0,0.2,1); width: 0; }
+
+        /* Net badge */
+        .net-badge {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 10px;
+            font-size: 0.82rem; font-weight: 700; color: #34d399;
+            text-align: center;
+        }
+
+        /* Milestone stepper */
+        .ms-card {
+            background: #0f1923;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 22px 22px 20px;
+            margin-bottom: 24px;
+        }
+        .ms-card h3 {
+            font-size: 0.95rem; font-weight: 600; color: #e2e8f0;
+            margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .ms-badge {
+            font-size: 0.72rem; font-weight: 600;
+            padding: 3px 11px;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 20px;
+            color: #10b981;
+        }
+        .milestone-stepper { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding-bottom: 4px; }
+        .milestone { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 140px; position: relative; }
+        .ms-node {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; z-index: 2; transition: transform 0.2s;
+        }
+        .ms-node i { width: 20px; height: 20px; }
+        .milestone:hover .ms-node { transform: scale(1.1); }
+        .milestone.completed .ms-node { background: rgba(16,185,129,0.18); border: 2px solid #10b981; color: #10b981; }
+        .milestone.active .ms-node { background: rgba(56,189,248,0.18); border: 2px solid #38bdf8; color: #38bdf8; animation: pulse-blue 2s infinite; }
+        .milestone.upcoming .ms-node { background: rgba(148,163,184,0.1); border: 2px solid rgba(148,163,184,0.3); color: #64748b; }
+        @keyframes pulse-blue { 0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,0)} 50%{box-shadow:0 0 0 8px rgba(56,189,248,0.15)} }
+        .ms-connector {
+            position: absolute; top: 22px; left: 50%; width: 100%; height: 2px; z-index: 1;
+            background: rgba(255,255,255,0.07);
+        }
+        .milestone.completed .ms-connector { background: linear-gradient(90deg, #10b981, rgba(16,185,129,0.2)); }
+        .milestone.active .ms-connector { background: linear-gradient(90deg, #38bdf8, rgba(56,189,248,0.1)); }
+        .milestone:last-child .ms-connector { display: none; }
+        .ms-body { margin-top: 14px; text-align: center; padding: 0 8px; }
+        .ms-phase { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 4px; }
+        .ms-title { font-size: 0.9rem; font-weight: 600; color: #e2e8f0; margin-bottom: 3px; }
+        .ms-meta { font-size: 0.72rem; color: #64748b; margin-bottom: 3px; }
+        .ms-date { font-size: 0.72rem; color: #64748b; }
+        .completed-date { color: #10b981; font-weight: 600; }
+        .ms-pbar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin: 8px auto 4px; width: 80%; }
+        .ms-pfill { height: 100%; background: linear-gradient(90deg,#38bdf8,#10b981); border-radius: 3px; }
+        .ms-plabel { font-size: 0.7rem; color: #38bdf8; font-weight: 600; }
+
+        /* Quick-links row */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .quick-link {
+            display: flex; align-items: center; gap: 12px;
+            background: #0f1923;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 16px 18px;
+            text-decoration: none; color: #e2e8f0;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+        .quick-link:hover { border-color: rgba(16,185,129,0.35); transform: translateY(-1px); }
+        .quick-link .ql-icon {
+            width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .quick-link .ql-icon i { width: 18px; height: 18px; }
+        .quick-link .ql-text { font-size: 0.85rem; font-weight: 600; }
+        .quick-link .ql-sub { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
+        .quick-link i.arrow { margin-left: auto; width: 16px; height: 16px; color: #475569; }
+
+        @media (max-width: 960px) {
+            .overview-charts { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 680px) {
+            .hero-banner { flex-direction: column; padding: 20px 18px; }
+            .hero-stats { justify-content: center; }
+            .impact-row { grid-template-columns: repeat(2, 1fr); }
+            .chart-canvas-wrap { height: 220px; }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar / Navigation -->
+        <!-- Sidebar -->
         <aside class="sidebar glass-panel" id="sidebar">
             <div class="brand">
                 <img src="biovil_logo.svg" alt="BioViL Logo" class="brand-logo">
                 <h2 class="brand-text">BioViL</h2>
             </div>
-
-            <!-- Sidebar Toggle Button (visible on small screens) -->
             <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle Sidebar">
                 <i data-lucide="menu"></i>
             </button>
-
             <nav class="nav-menu">
                 <a href="index.html" class="nav-item active" title="Overview">
                     <i data-lucide="layout-dashboard"></i>
@@ -48,7 +274,6 @@
                     <span class="nav-label">System Health</span>
                 </a>
             </nav>
-
             <div class="sidebar-footer">
                 <p class="nav-label">Pioneer Phase</p>
                 <div class="status-indicator">
@@ -58,134 +283,185 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main -->
         <main class="main-content">
             <header class="top-header">
                 <div>
-                    <h1 class="page-title">Impact Dashboard</h1>
-                    <p class="subtitle">Real-time monitoring of BioViL's environmental and social KPIs.</p>
+                    <h1 class="page-title">Impact Overview</h1>
+                    <p class="subtitle">Live environmental &amp; social KPIs — BioViL, Rampur, Assam.</p>
+                    <p class="live-timestamp" id="last-updated">Loading…</p>
                 </div>
-                    <button class="date-filter">
+                <div class="header-right">
+                    <div class="days-active-badge glass-panel">
+                        <i data-lucide="clock"></i>
+                        <span id="days-active">0</span> days active
+                    </div>
+                    <button class="date-filter glass-panel">
                         <i data-lucide="calendar"></i>
                         <span id="date-filter-label">Since Jan 2026</span>
                         <i data-lucide="chevron-down" class="dropdown-icon"></i>
                     </button>
+                </div>
             </header>
 
-            <!-- Hero KPI Cards (Real data from Project 1 — operational since Jan 15, 2026) -->
-            <section class="kpi-grid">
-                <div class="kpi-card glass-panel interactive-hover">
-                    <div class="kpi-icon-wrapper env-accent">
-                        <i data-lucide="cloud-off"></i>
-                    </div>
-                    <div class="kpi-details">
-                        <p class="kpi-label">CO₂e Avoided</p>
-                        <h3 class="kpi-value"><span id="kpi-co2">1,021</span> <span class="unit">kg</span></h3>
-                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~1.02 tons cumulative</p>
-                    </div>
+            <!-- Hero Photo Banner -->
+            <div class="hero-photo-banner">
+                <img src="assets/hero.png" alt="Biodigester">
+                <div class="hero-photo-overlay">
+                    <h2>Converting waste to clean energy</h2>
+                    <p>Rampur, Assam Pilot</p>
                 </div>
+            </div>
 
-                <div class="kpi-card glass-panel interactive-hover">
-                    <div class="kpi-icon-wrapper waste-accent">
-                        <i data-lucide="recycle"></i>
+            <!-- 5 Impact KPI tiles -->
+            <div class="impact-row">
+                <div class="impact-tile">
+                    <div class="it-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i data-lucide="cloud-off"></i></div>
+                    <div>
+                        <span class="it-val"><span id="kpi-co2">0</span> <span class="it-unit">kg CO₂e</span></span>
                     </div>
-                    <div class="kpi-details">
-                        <p class="kpi-label">Waste Diverted</p>
-                        <h3 class="kpi-value"><span id="kpi-waste">1,400</span> <span class="unit">kg</span></h3>
-                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> 600 kg/mo manure</p>
-                    </div>
+                    <div class="it-lbl">GHGe Avoided</div>
+                    <div class="it-trend"><i data-lucide="trending-up"></i> Cumulative since Jan '26</div>
                 </div>
-
-                <div class="kpi-card glass-panel interactive-hover">
-                    <div class="kpi-icon-wrapper energy-accent">
-                        <i data-lucide="zap"></i>
+                <div class="impact-tile">
+                    <div class="it-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i data-lucide="recycle"></i></div>
+                    <div>
+                        <span class="it-val"><span id="kpi-waste">0</span> <span class="it-unit">kg</span></span>
                     </div>
-                    <div class="kpi-details">
-                        <p class="kpi-label">Biogas Produced</p>
-                        <h3 class="kpi-value"><span id="kpi-biogas">47</span> <span class="unit">m³</span></h3>
-                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~20 m³/month</p>
-                    </div>
+                    <div class="it-lbl">Waste Diverted</div>
+                    <div class="it-trend"><i data-lucide="trending-up"></i> 600 kg/mo manure</div>
                 </div>
-
-                <div class="kpi-card glass-panel interactive-hover">
-                    <div class="kpi-icon-wrapper social-accent">
-                        <i data-lucide="smile"></i>
+                <div class="impact-tile">
+                    <div class="it-icon" style="background:rgba(251,191,36,0.15);color:#fbbf24"><i data-lucide="zap"></i></div>
+                    <div>
+                        <span class="it-val"><span id="kpi-biogas">0</span> <span class="it-unit">m³</span></span>
                     </div>
-                    <div class="kpi-details">
-                        <p class="kpi-label">Smoke-Free Hours</p>
-                        <h3 class="kpi-value"><span id="kpi-smoke">210</span> <span class="unit">hrs</span></h3>
-                        <p class="kpi-trend positive"><i data-lucide="trending-up"></i> ~3 hrs/day saved</p>
-                    </div>
+                    <div class="it-lbl">Biogas Produced</div>
+                    <div class="it-trend"><i data-lucide="trending-up"></i> <span id="kpi-biogas-trend">—</span></div>
                 </div>
-            </section>
-
-            <!-- Charts Section -->
-            <section class="charts-grid">
-                <!-- Main Trend Chart -->
-                <div class="chart-card glass-panel main-chart">
-                    <div class="chart-header">
-                        <h3>Biogas Output & Waste Input</h3>
-                        <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+                <div class="impact-tile">
+                    <div class="it-icon" style="background:rgba(167,139,250,0.15);color:#a78bfa"><i data-lucide="smile"></i></div>
+                    <div>
+                        <span class="it-val"><span id="kpi-smoke">0</span> <span class="it-unit">hrs</span></span>
                     </div>
-                    <div class="chart-container">
+                    <div class="it-lbl">Smoke-Free Hours</div>
+                    <div class="it-trend"><i data-lucide="trending-up"></i> ~3 hrs/day saved</div>
+                </div>
+                <div class="impact-tile">
+                    <div class="it-icon" style="background:rgba(251,191,36,0.12);color:#fbbf24"><i data-lucide="leaf"></i></div>
+                    <div>
+                        <span class="it-val"><span id="kpi-bioslurry">0</span> <span class="it-unit">kg</span></span>
+                    </div>
+                    <div class="it-lbl">Bioslurry Produced</div>
+                    <div class="it-trend"><i data-lucide="trending-up"></i> Nutrient-rich fertiliser</div>
+                </div>
+            </div>
+
+            <!-- Charts row -->
+            <div class="overview-charts">
+                <!-- Biogas trend -->
+                <div class="chart-box">
+                    <h3>
+                        Biogas Output &amp; Waste Input — Weekly
+                        <button class="download-btn" id="trend-export-btn" title="Download PNG"><i data-lucide="download"></i></button>
+                    </h3>
+                    <div class="chart-canvas-wrap">
                         <canvas id="trendChart"></canvas>
                     </div>
-                </div>
-
-                <!-- Doughnut Chart -->
-                <div class="chart-card glass-panel side-chart">
-                    <div class="chart-header">
-                        <h3>Feedstock Composition</h3>
-                    </div>
-                    <div class="chart-container doughnut-container">
-                        <canvas id="compositionChart"></canvas>
-                    </div>
-                    <div class="chart-legend" id="compositionLegend"></div>
-                </div>
-
-                <!-- Secondary Bar Chart -->
-                <div class="chart-card glass-panel bottom-chart">
-                    <div class="chart-header">
-                        <h3>Active Biodigester Systems</h3>
-                    </div>
-                    <div class="chart-container bar-container">
-                        <canvas id="adoptionChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Progress Goals Chart -->
-                <div class="chart-card glass-panel bottom-chart">
-                    <div class="chart-header">
-                        <h3>Pioneer Phase Scaling Goal</h3>
-                    </div>
-                    <div class="goal-container">
-                        <div class="circular-progress">
-                            <svg viewBox="0 0 36 36" class="circular-chart">
-                                <path class="circle-bg"
-                                  d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                />
-                                <path class="circle"
-                                  stroke-dasharray="20, 100"
-                                  d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                />
-                                <text x="18" y="20.35" class="percentage">20%</text>
-                            </svg>
+                    <!-- 2026 GHGe target progress -->
+                    <div class="target-progress" style="margin-top:16px">
+                        <div class="tp-header">
+                            <span class="tp-title">2026 GHGe Avoidance Target (5,260 kg)</span>
+                            <span class="tp-val" id="tp-pct">0%</span>
                         </div>
-                        <div class="goal-details">
-                            <p>Target: 5 Active Systems by Year End</p>
-                            <span>Currently: 1 Biodigester (Rampur)</span>
+                        <div class="tp-bar"><div class="tp-fill" id="tp-fill"></div></div>
+                    </div>
+                </div>
+
+                <!-- Climate Impact bar -->
+                <div class="chart-box">
+                    <h3>Climate Impact Breakdown</h3>
+                    <div class="chart-canvas-wrap tall">
+                        <canvas id="climateImpactChart"></canvas>
+                    </div>
+                    <div class="net-badge" id="climate-net-impact">Net GHGe Avoided: — kg/month</div>
+                </div>
+            </div>
+
+            <!-- Quick links to drill-downs -->
+            <div class="quick-links">
+                <a href="project1.html" class="quick-link">
+                    <div class="ql-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i data-lucide="map-pin"></i></div>
+                    <div><div class="ql-text">Project Dashboard</div><div class="ql-sub">Rampur, Assam — Prototype 1</div></div>
+                    <i data-lucide="chevron-right" class="arrow"></i>
+                </a>
+                <a href="project1.html#environmental-tab" class="quick-link">
+                    <div class="ql-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i data-lucide="leaf"></i></div>
+                    <div><div class="ql-text">Environmental</div><div class="ql-sub">GHGe gauge &amp; emissions sources</div></div>
+                    <i data-lucide="chevron-right" class="arrow"></i>
+                </a>
+                <a href="project1.html#social-tab" class="quick-link">
+                    <div class="ql-icon" style="background:rgba(167,139,250,0.15);color:#a78bfa"><i data-lucide="users"></i></div>
+                    <div><div class="ql-text">Social Impact</div><div class="ql-sub">Jobs, training &amp; budget</div></div>
+                    <i data-lucide="chevron-right" class="arrow"></i>
+                </a>
+                <a href="project1.html#health-tab" class="quick-link">
+                    <div class="ql-icon" style="background:rgba(251,191,36,0.12);color:#fbbf24"><i data-lucide="activity"></i></div>
+                    <div><div class="ql-text">System Health</div><div class="ql-sub">Uptime, retention &amp; ops log</div></div>
+                    <i data-lucide="chevron-right" class="arrow"></i>
+                </a>
+            </div>
+
+            <!-- Milestone Stepper -->
+            <div class="ms-card">
+                <h3>Pioneer Phase — Project Roadmap <span class="ms-badge">1 / 5 Systems Active</span></h3>
+                <div class="milestone-stepper">
+                    <div class="milestone completed">
+                        <div class="ms-node"><i data-lucide="check-circle"></i></div>
+                        <div class="ms-connector"></div>
+                        <div class="ms-body">
+                            <p class="ms-phase">Phase 1</p>
+                            <p class="ms-title">Prototype Built</p>
+                            <p class="ms-meta">Rampur, Assam</p>
+                            <p class="ms-date completed-date">✓ Jan 2026</p>
+                        </div>
+                    </div>
+                    <div class="milestone active">
+                        <div class="ms-node"><i data-lucide="loader"></i></div>
+                        <div class="ms-connector"></div>
+                        <div class="ms-body">
+                            <p class="ms-phase">Phase 2</p>
+                            <p class="ms-title">5 Active Systems</p>
+                            <p class="ms-meta">Assam Region</p>
+                            <p class="ms-date">Target: Dec 2026</p>
+                            <div class="ms-pbar"><div class="ms-pfill" style="width:20%"></div></div>
+                            <p class="ms-plabel">1 of 5 (20%)</p>
+                        </div>
+                    </div>
+                    <div class="milestone upcoming">
+                        <div class="ms-node"><i data-lucide="clock"></i></div>
+                        <div class="ms-connector"></div>
+                        <div class="ms-body">
+                            <p class="ms-phase">Phase 3</p>
+                            <p class="ms-title">20 Systems</p>
+                            <p class="ms-meta">Northeast India</p>
+                            <p class="ms-date">Target: 2027</p>
+                        </div>
+                    </div>
+                    <div class="milestone upcoming">
+                        <div class="ms-node"><i data-lucide="flag"></i></div>
+                        <div class="ms-body">
+                            <p class="ms-phase">Phase 4</p>
+                            <p class="ms-title">100 Systems</p>
+                            <p class="ms-meta">All India Scale</p>
+                            <p class="ms-date">Target: 2028</p>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </main>
     </div>
 
-    <!-- Initialize Scripts -->
     <script src="script.js"></script>
 </body>
 </html>

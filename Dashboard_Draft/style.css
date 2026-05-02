@@ -680,3 +680,535 @@ body {
     .main-content { padding: 16px 20px; }
     .page-title { font-size: 24px; }
 }
+
+/* ─── Live Timestamp ─────────────────────────────────────────────────────────── */
+.live-timestamp {
+    font-size: 12px;
+    color: var(--accent-primary);
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+    opacity: 0.85;
+}
+
+/* ─── Full-Width Chart Grid Slot ─────────────────────────────────────────────── */
+.full-width-chart {
+    grid-column: 1 / -1;
+    min-height: 180px;
+}
+
+/* ─── Doughnut Container Height ──────────────────────────────────────────────── */
+.doughnut-container {
+    position: relative;
+    height: 220px;
+    width: 100%;
+}
+
+/* ─── Net Impact Badge ───────────────────────────────────────────────────────── */
+.net-impact-badge {
+    margin-top: 14px;
+    padding: 10px 16px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-env);
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+
+/* ─── Chart Annotation Row ───────────────────────────────────────────────────── */
+.chart-annotation {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 16px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    min-height: 38px;
+}
+
+.anno-label {
+    color: var(--text-secondary);
+}
+
+.anno-value {
+    font-weight: 700;
+    color: var(--accent-env);
+}
+
+/* ─── Milestone Stepper ──────────────────────────────────────────────────────── */
+.milestone-stepper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    padding: 16px 0 8px;
+    overflow-x: auto;
+}
+
+.milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 160px;
+    position: relative;
+}
+
+.ms-node {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 2;
+    transition: transform 0.2s ease;
+}
+
+.ms-node i {
+    width: 20px;
+    height: 20px;
+}
+
+.milestone:hover .ms-node {
+    transform: scale(1.1);
+}
+
+.milestone.completed .ms-node {
+    background: rgba(16, 185, 129, 0.18);
+    border: 2px solid var(--accent-env);
+    color: var(--accent-env);
+}
+
+.milestone.active .ms-node {
+    background: rgba(56, 189, 248, 0.18);
+    border: 2px solid var(--accent-energy);
+    color: var(--accent-energy);
+    animation: pulse-blue 2s infinite;
+}
+
+@keyframes pulse-blue {
+    0%   { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.5); }
+    70%  { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+.milestone.upcoming .ms-node {
+    background: rgba(148, 163, 184, 0.1);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: var(--text-secondary);
+}
+
+/* Horizontal connector line between milestones */
+.ms-connector {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    z-index: 1;
+}
+
+.milestone.completed .ms-connector {
+    background: linear-gradient(90deg, var(--accent-env), rgba(16, 185, 129, 0.2));
+}
+
+.milestone.active .ms-connector {
+    background: linear-gradient(90deg, var(--accent-energy), rgba(56, 189, 248, 0.1));
+}
+
+/* Last milestone has no connector */
+.milestone:last-child .ms-connector {
+    display: none;
+}
+
+.ms-body {
+    margin-top: 16px;
+    text-align: center;
+    padding: 0 8px;
+}
+
+.ms-phase {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.ms-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.ms-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.ms-date {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.completed-date {
+    color: var(--accent-env);
+    font-weight: 600;
+}
+
+.ms-progress-bar {
+    height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 8px auto 4px;
+    width: 80%;
+}
+
+.ms-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-energy), var(--accent-env));
+    border-radius: 3px;
+    transition: width 1.2s ease;
+}
+
+.ms-progress-label {
+    font-size: 11px;
+    color: var(--accent-energy);
+    font-weight: 600;
+}
+
+/* ─── Badge — Systems count ──────────────────────────────────────────────────── */
+.badge-systems {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 20px;
+    color: var(--accent-env);
+    letter-spacing: 0.3px;
+}
+
+/* ─── Operational Log Timeline ───────────────────────────────────────────────── */
+.ops-log {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 4px;
+}
+
+.ops-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-left: 2px solid rgba(255,255,255,0.06);
+    margin-left: 10px;
+    position: relative;
+}
+
+.ops-entry:last-child {
+    border-left-color: transparent;
+}
+
+.ops-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-env);
+    border: 2px solid var(--bg-surface);
+    flex-shrink: 0;
+    margin-left: -7px;
+    margin-top: 3px;
+}
+
+.upcoming-dot {
+    background: rgba(148, 163, 184, 0.3);
+    border-color: var(--bg-surface);
+}
+
+.ops-content {
+    flex: 1;
+    padding-bottom: 4px;
+}
+
+.ops-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.ops-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.ops-entry.upcoming .ops-title {
+    color: var(--text-secondary);
+}
+
+/* ─── Header Right Group ─────────────────────────────────────────────────────── */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ─── Days Active Badge ──────────────────────────────────────────────────────── */
+.days-active-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-energy);
+    white-space: nowrap;
+}
+
+.days-active-badge i { width: 14px; height: 14px; opacity: 0.8; }
+
+/* ─── KPI Grid — auto-fit for 5+ cards ──────────────────────────────────────── */
+.kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+/* ─── Social Impact Target Rows ──────────────────────────────────────────────── */
+.social-targets {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 16px;
+}
+
+.social-target-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.st-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.st-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.st-label i { width: 14px; height: 14px; color: var(--text-secondary); }
+
+.st-result { font-size: 12px; color: var(--text-secondary); }
+
+.st-bar-bg {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.st-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.st-meta { font-size: 11px; color: var(--text-secondary); margin: 0; }
+
+/* ─── Radial Gauge ───────────────────────────────────────────────────────────── */
+.gauge-outer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    padding: 16px 0 12px;
+    gap: 20px;
+}
+
+.gauge-svg {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+}
+
+.gauge-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    border-radius: 14px;
+    padding: 14px 20px;
+}
+
+.gauge-meta-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.gauge-meta-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.gauge-meta-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.gauge-meta-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-env);
+}
+
+@media (max-width: 680px) {
+    .gauge-meta-row {
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px 16px;
+    }
+    .gauge-meta-divider {
+        width: 60px;
+        height: 1px;
+    }
+    .gauge-svg { max-width: 240px; }
+}
+
+/* ─── Photo Integrations ─── */
+.hero-photo-banner {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    height: 220px;
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+.hero-photo-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+}
+.hero-photo-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, rgba(10,14,18,0.9) 0%, rgba(10,14,18,0.5) 40%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 40px;
+}
+.hero-photo-overlay h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.hero-photo-overlay p {
+    font-size: 1.1rem;
+    color: #e2e8f0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+@media (max-width: 768px) {
+    .hero-photo-overlay { padding: 0 24px; background: linear-gradient(to right, rgba(10,14,18,0.95) 0%, rgba(10,14,18,0.7) 60%, rgba(10,14,18,0.4) 100%); }
+    .hero-photo-overlay h2 { font-size: 1.5rem; }
+    .hero-photo-banner { height: 180px; }
+}
+
+.photo-strip {
+    margin-top: 32px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+.photo-strip img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.family-impact-card {
+    background: #0f1923;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.family-impact-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center 40%;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.family-impact-card .fic-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.fic-content h3 {
+    font-size: 1.15rem;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.fic-content p {
+    font-size: 0.95rem;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+.fic-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 20px;
+}
+.fic-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #10b981;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: rgba(16,185,129,0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+.fic-stat i { width: 16px; height: 16px; }
