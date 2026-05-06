@@ -3,3 +3,18 @@ __pycache__/
 *.pyc
 .DS_Store
 .env
+
+# Sensitive Documents and Models
+*.pdf
+*.xlsx
+*.docx
+*.csv
+
+# Sensitive Directories
+Resources - Year 1/
+Project 1/
+Dashboard_Draft/Documentation/
+
+# Other unnecessary files
+Pioneer Requirements.png
+read_pdfs.py
