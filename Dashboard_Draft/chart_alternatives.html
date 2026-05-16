@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chart Alternatives — BioViL Emissions</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: #080d14;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+  .page-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .page-header .badge {
+    display: inline-block;
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f0f9ff, #a5f3fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .page-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 600px), 1fr));
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  @media (max-width: 680px) {
+    body { padding: 20px 14px 60px; }
+    .page-header h1 { font-size: 1.3rem; }
+    .card { padding: 18px 16px 16px; }
+    .chart-wrap { height: 200px; }
+    .gauge-svg { width: 200px; height: 115px; }
+    .gauge-wrap { height: 200px; }
+    .card-title { font-size: 0.95rem; }
+    .card-subtitle { font-size: 0.75rem; }
+  }
+  .card {
+    background: #0f1923;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .card:hover { border-color: rgba(16,185,129,0.35); }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent, linear-gradient(90deg, #10b981, #3b82f6));
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .option-number {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--num-bg, rgba(16,185,129,0.15));
+    color: var(--num-color, #10b981);
+    border: 1px solid var(--num-border, rgba(16,185,129,0.3));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .card-title { font-size: 1.05rem; font-weight: 600; color: #f1f5f9; }
+  .card-subtitle { font-size: 0.8rem; color: #64748b; margin-top: 3px; line-height: 1.4; }
+  .chart-wrap { position: relative; height: 260px; }
+
+  /* Option 3 — Gauge */
+  .gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 260px;
+    gap: 0;
+  }
+  .gauge-svg { width: 260px; height: 150px; }
+
+  /* Option 5 — Diverging */
+  /* uses canvas */
+
+  /* Annotation row */
+  .anno-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.18);
+    border-radius: 10px;
+    padding: 10px 18px;
+  }
+  .anno-label { color: #64748b; font-size: 0.8rem; }
+  .anno-value { color: #10b981; font-size: 1rem; font-weight: 700; }
+
+  /* Pills */
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .tag {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .tag-green { background: rgba(16,185,129,0.12); color: #34d399; }
+  .tag-blue  { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .tag-amber { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .tag-red   { background: rgba(248,113,113,0.12); color: #f87171; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="badge">🎨 Chart Alternatives</div>
+  <h1>Emissions: Baseline vs. BioViL — Pick Your Style</h1>
+  <p>All 5 options use the same live project data. Tell me which one to implement.</p>
+</div>
+
+<div class="grid">
+
+  <!-- Option 1: Savings Gap Area -->
+  <div class="card" style="--accent: linear-gradient(90deg,#10b981,#34d399)">
+    <div class="card-header">
+      <div class="option-number" style="--num-bg:rgba(16,185,129,0.15);--num-color:#10b981;--num-border:rgba(16,185,129,0.3)">1</div>
+      <div>
+        <div class="card-title">Savings Gap — Single Story Area</div>
+        <div class="card-subtitle">Only the avoided CO₂e is shown as a growing green area. One message, zero noise.</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="c1"></canvas></div>
+    <div class="anno-row"><span class="anno-label">Cumulative CO₂e Avoided:</span><span class="anno-value" id="a1">—</span></div>
+    <div class="tag-row"><span class="tag tag-green">✅ Cleanest</span><span class="tag tag-green">✅ Investor-ready</span><span class="tag tag-blue">Animated fill</span></div>
+  </div>
+
+  <!-- Option 2: Grouped Monthly Bar -->
+  <div class="card" style="--accent: linear-gradient(90deg,#3b82f6,#818cf8)">
+    <div class="card-header">
+      <div class="option-number" style="--num-bg:rgba(59,130,246,0.15);--num-color:#60a5fa;--num-border:rgba(59,130,246,0.3)">2</div>
+      <div>
+        <div class="card-title">Grouped Monthly Bar Chart</div>
+        <div class="card-subtitle">Side-by-side bars per month — great for period-by-period comparison.</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="c2"></canvas></div>
+    <div class="anno-row"><span class="anno-label">Total Avoided (all months):</span><span class="anno-value" id="a2">—</span></div>
+    <div class="tag-row"><span class="tag tag-blue">✅ Familiar format</span><span class="tag tag-blue">Good for reports</span><span class="tag tag-amber">Monthly granularity</span></div>
+  </div>
+
+  <!-- Option 3: Radial Gauge -->
+  <div class="card" style="--accent: linear-gradient(90deg,#fbbf24,#f97316)">
+    <div class="card-header">
+      <div class="option-number" style="--num-bg:rgba(251,191,36,0.15);--num-color:#fbbf24;--num-border:rgba(251,191,36,0.3)">3</div>
+      <div>
+        <div class="card-title">Progress Radial Gauge</div>
+        <div class="card-subtitle">% of the 5,260 kg annual target already avoided — like a speedometer.</div>
+      </div>
+    </div>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" id="gaugeSvg" viewBox="0 0 260 150">
+        <defs>
+          <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#10b981"/>
+            <stop offset="100%" stop-color="#34d399"/>
+          </linearGradient>
+        </defs>
+        <!-- Track -->
+        <path id="gaugeTrack" d="" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="18" stroke-linecap="round"/>
+        <!-- Fill -->
+        <path id="gaugeFill" d="" fill="none" stroke="url(#gGrad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="0 1000"/>
+        <!-- Centre text -->
+        <text x="130" y="128" text-anchor="middle" font-family="Outfit,sans-serif" font-size="28" font-weight="700" fill="#f0fdf4" id="gaugePct">0%</text>
+        <text x="130" y="148" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="#64748b">of 2026 target</text>
+      </svg>
+      <div style="font-size:0.8rem;color:#64748b;text-align:center;margin-top:4px">Annual Target: 5,260 kg CO₂e</div>
+    </div>
+    <div class="anno-row"><span class="anno-label">Avoided so far:</span><span class="anno-value" id="a3">—</span></div>
+    <div class="tag-row"><span class="tag tag-amber">✅ Highly visual</span><span class="tag tag-amber">Perfect KPI tile</span><span class="tag tag-blue">Animated draw</span></div>
+  </div>
+
+  <!-- Option 4: Waterfall -->
+  <div class="card" style="--accent: linear-gradient(90deg,#a78bfa,#818cf8)">
+    <div class="card-header">
+      <div class="option-number" style="--num-bg:rgba(167,139,250,0.15);--num-color:#a78bfa;--num-border:rgba(167,139,250,0.3)">4</div>
+      <div>
+        <div class="card-title">Waterfall — Savings by Source</div>
+        <div class="card-subtitle">Shows how methane avoidance + firewood avoidance stack up to the total impact.</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="c4"></canvas></div>
+    <div class="anno-row"><span class="anno-label">Total GHGe Avoided:</span><span class="anno-value" id="a4">—</span></div>
+    <div class="tag-row"><span class="tag tag-blue">✅ ESG standard</span><span class="tag tag-blue">Shows source breakdown</span><span class="tag tag-green">Storytelling</span></div>
+  </div>
+
+  <!-- Option 5: Diverging Bar -->
+  <div class="card" style="--accent: linear-gradient(90deg,#f87171,#10b981)" style="grid-column: span 2;">
+    <div class="card-header">
+      <div class="option-number" style="--num-bg:rgba(248,113,113,0.15);--num-color:#f87171;--num-border:rgba(248,113,113,0.3)">5</div>
+      <div>
+        <div class="card-title">Diverging Bar — Baseline Up / BioViL Down</div>
+        <div class="card-subtitle">Baseline emissions go upward (bad); BioViL impact goes downward (negative = good). Striking contrast for pitches.</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:280px"><canvas id="c5"></canvas></div>
+    <div class="anno-row"><span class="anno-label">Net Balance:</span><span class="anno-value" id="a5">—</span></div>
+    <div class="tag-row"><span class="tag tag-red">✅ Most memorable</span><span class="tag tag-green">✅ Pitch-deck ready</span><span class="tag tag-blue">Dual axis story</span></div>
+  </div>
+
+</div><!-- /grid -->
+
+<script>
+// ── Data helpers ──────────────────────────────────────────────────────────────
+function pseudoRandom(seed) { let x = Math.sin(seed)*10000; return x-Math.floor(x); }
+function getISOWeek(d) {
+  const date = new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));
+  const ys = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-ys)/86400000)+1)/7);
+}
+
+// ── Generate weekly project data ──────────────────────────────────────────────
+const startDate = new Date(2026,0,15);
+const now = new Date();
+const yieldCurve = [0.016,0.018,0.026,0.030,0.033,0.035,0.035,0.034,0.032,0.028,0.022,0.017];
+
+const BASELINE_WEEKLY = 438.1/4.33;
+let wLabels=[], wWaste=[], wBiogas=[], wBaseC=[], wBiViC=[];
+let bBase=0, bBioVil=0;
+let cur = new Date(startDate), wi=0;
+while (cur <= now) {
+  const m = cur.getMonth();
+  wLabels.push(`W${getISOWeek(cur)} ${new Intl.DateTimeFormat('en-US',{month:'short'}).format(cur)}`);
+  const bw = wi===0?70:140;
+  const ww = Math.round(bw*(1.0+pseudoRandom(wi*123.45)*0.3-0.15));
+  const wb = Number((ww*yieldCurve[m]*(1.0+pseudoRandom(wi*678.9)*0.1-0.05)).toFixed(1));
+  wWaste.push(ww); wBiogas.push(wb);
+  bBase   += BASELINE_WEEKLY;
+  bBioVil += wb*1.2;
+  wBaseC.push(Math.round(bBase));
+  wBiViC.push(Math.round(bBioVil*10)/10);
+  cur.setDate(cur.getDate()+7); wi++;
+}
+const netAvoided = Math.round(bBase - bBioVil);
+
+// ── Monthly rollup for bar charts ─────────────────────────────────────────────
+const monthMap = {};
+wLabels.forEach((lbl,i) => {
+  const month = lbl.split(' ')[1];
+  if (!monthMap[month]) monthMap[month] = {base:0, biovil:0};
+  monthMap[month].base   += BASELINE_WEEKLY;
+  monthMap[month].biovil += wBiogas[i]*1.2;
+});
+const mLabels = Object.keys(monthMap);
+const mBase   = mLabels.map(m => Math.round(monthMap[m].base));
+const mBioVil = mLabels.map(m => Math.round(monthMap[m].biovil));
+const mAvoided = mLabels.map((_,i) => Math.round(mBase[i]-mBioVil[i]));
+
+// ── Chart defaults ────────────────────────────────────────────────────────────
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.font.family = "'Outfit', sans-serif";
+Chart.defaults.scale.grid.color = 'rgba(255,255,255,0.05)';
+
+const TT = {
+  backgroundColor:'rgba(10,14,18,0.96)',
+  padding:12, cornerRadius:10,
+  borderColor:'rgba(255,255,255,0.08)', borderWidth:1,
+  titleFont:{size:12,weight:'600'}, bodyFont:{size:11}
+};
+
+// ── Option 1: Savings Gap ─────────────────────────────────────────────────────
+(function(){
+  const gap = wBaseC.map((b,i) => Math.round(b - wBiViC[i]));
+  const ctx = document.getElementById('c1').getContext('2d');
+  const g = ctx.createLinearGradient(0,0,0,260);
+  g.addColorStop(0,'rgba(16,185,129,0.5)');
+  g.addColorStop(1,'rgba(16,185,129,0.02)');
+  new Chart(ctx,{
+    type:'line',
+    data:{ labels:wLabels, datasets:[{
+      label:'CO₂e Avoided (kg)',
+      data: gap,
+      borderColor:'#10b981',
+      backgroundColor: g,
+      borderWidth:2.5, tension:0.4, fill:true,
+      pointRadius:0, pointHoverRadius:5
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...TT} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{maxTicksLimit:10, font:{size:10}} },
+        y:{ beginAtZero:true, title:{display:true,text:'kg CO₂e Avoided'} }
+      }
+    }
+  });
+  document.getElementById('a1').textContent = netAvoided.toLocaleString()+' kg CO₂e';
+})();
+
+// ── Option 2: Grouped Monthly Bar ────────────────────────────────────────────
+(function(){
+  const ctx = document.getElementById('c2').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: mLabels,
+      datasets:[
+        { label:'Baseline (kg GHGe)', data:mBase, backgroundColor:'rgba(248,113,113,0.7)', borderRadius:5, borderSkipped:false },
+        { label:'With BioViL (kg CO₂)', data:mBioVil, backgroundColor:'rgba(16,185,129,0.7)', borderRadius:5, borderSkipped:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top', labels:{usePointStyle:true,boxWidth:8,padding:14}}, tooltip:{...TT} },
+      scales:{
+        x:{ grid:{display:false} },
+        y:{ beginAtZero:true, title:{display:true,text:'kg GHGe / month'} }
+      }
+    }
+  });
+  document.getElementById('a2').textContent = netAvoided.toLocaleString()+' kg CO₂e';
+})();
+
+// ── Option 3: Radial Gauge (SVG) ─────────────────────────────────────────────
+(function(){
+  const ANNUAL_TARGET = 5260;
+  const pct = Math.min(netAvoided / ANNUAL_TARGET, 1);
+  const cx=130, cy=140, r=100, start=-Math.PI, end=0;
+
+  function polarToXY(angle) {
+    return [cx + r*Math.cos(angle), cy + r*Math.sin(angle)];
+  }
+  function arcPath(fromAngle, toAngle) {
+    const [x1,y1] = polarToXY(fromAngle);
+    const [x2,y2] = polarToXY(toAngle);
+    const large = (toAngle-fromAngle) > Math.PI ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+  }
+
+  document.getElementById('gaugeTrack').setAttribute('d', arcPath(-Math.PI, 0));
+  const fillPath = arcPath(-Math.PI, -Math.PI + pct*Math.PI);
+  document.getElementById('gaugeFill').setAttribute('d', fillPath);
+  document.getElementById('gaugePct').textContent = Math.round(pct*100)+'%';
+  document.getElementById('a3').textContent = netAvoided.toLocaleString()+' kg CO₂e';
+
+  // Animate fill via stroke-dasharray trick on a circle perimeter
+  const fillEl = document.getElementById('gaugeFill');
+  const totalLen = Math.PI * r; // half circle
+  fillEl.style.strokeDasharray = `0 ${totalLen}`;
+  fillEl.style.transition = 'stroke-dasharray 1.4s cubic-bezier(0.4,0,0.2,1)';
+  setTimeout(() => {
+    fillEl.style.strokeDasharray = `${pct*totalLen} ${totalLen}`;
+  }, 200);
+})();
+
+// ── Option 4: Waterfall ───────────────────────────────────────────────────────
+(function(){
+  const months = Math.max(0.5,(now-startDate)/(1000*60*60*24*30.44));
+  const methane  = Math.round(218*months);
+  const firewood = Math.round(220.1*months);
+  const total    = methane+firewood;
+
+  const ctx = document.getElementById('c4').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Methane\nAvoided','Firewood CO₂\nAvoided','Total GHGe\nAvoided'],
+      datasets:[
+        {
+          label:'Avoided kg CO₂e',
+          data:[methane, firewood, total],
+          backgroundColor:['#fbbf24','#38bdf8','#10b981'],
+          borderRadius:8, borderSkipped:false
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...TT,callbacks:{label:c=>` ${c.label}: ${c.raw.toLocaleString()} kg CO₂e`}} },
+      scales:{
+        x:{ grid:{display:false} },
+        y:{ beginAtZero:true, title:{display:true,text:'kg CO₂e Avoided'} }
+      }
+    }
+  });
+  document.getElementById('a4').textContent = total.toLocaleString()+' kg CO₂e';
+})();
+
+// ── Option 5: Diverging Bar ───────────────────────────────────────────────────
+(function(){
+  const ctx = document.getElementById('c5').getContext('2d');
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: mLabels,
+      datasets:[
+        {
+          label:'Baseline Emissions (kg GHGe)',
+          data: mBase,
+          backgroundColor:'rgba(248,113,113,0.72)',
+          borderRadius:6, borderSkipped:false, order:1
+        },
+        {
+          label:'BioViL Impact (negative = avoided)',
+          data: mBioVil.map(v => -v),
+          backgroundColor:'rgba(16,185,129,0.72)',
+          borderRadius:6, borderSkipped:false, order:2
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top', labels:{usePointStyle:true,boxWidth:8,padding:14}},
+        tooltip:{...TT, callbacks:{
+          label: c => {
+            const raw = Math.abs(c.raw);
+            return c.datasetIndex===0
+              ? ` Baseline: ${raw.toLocaleString()} kg emitted`
+              : ` BioViL: ${raw.toLocaleString()} kg avoided`;
+          }
+        }}
+      },
+      scales:{
+        x:{ grid:{display:false} },
+        y:{ title:{display:true,text:'kg GHGe (↑ emitted / ↓ avoided)'},
+            ticks:{ callback: v => (v<0?'−':'')+Math.abs(v) } }
+      }
+    }
+  });
+  document.getElementById('a5').textContent = netAvoided.toLocaleString()+' kg CO₂e net avoided';
+})();
+</script>
+</body>
+</html>
