@@ -288,6 +288,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ─── Mobile Bottom Nav Tab Switching ──────────────────────────────────────────
+    const mobTabs = document.querySelectorAll('.mob-tab[data-mob-tab]');
+    mobTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = tab.getAttribute('data-mob-tab');
+            // Switch tab content
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            tabContents.forEach(t => t.classList.remove('active'));
+            const targetTab = document.getElementById(targetId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+                setTimeout(() => initChartsForTab(targetId), 50);
+            }
+            // Update sidebar nav active state
+            const matchingSidebarItem = document.querySelector(`.nav-item[data-tab="${targetId}"]`);
+            if (matchingSidebarItem) matchingSidebarItem.classList.add('active');
+            // Update bottom nav active state
+            document.querySelectorAll('.mob-tab').forEach(m => m.classList.remove('active'));
+            tab.classList.add('active');
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Re-initialize icons
+            lucide.createIcons();
+        });
+    });
+
+    // Set bottom nav active state from URL hash
+    const mobileHash = window.location.hash.replace('#', '');
+    if (mobileHash) {
+        document.querySelectorAll('.mob-tab').forEach(m => m.classList.remove('active'));
+        const matchingMobTab = document.querySelector(`.mob-tab[data-mob-tab="${mobileHash}"]`);
+        if (matchingMobTab) matchingMobTab.classList.add('active');
+    }
+
     // ─── Auto-Refresh (every 60 s) ────────────────────────────────────────────
     setInterval(() => {
         // Regenerate data (adds new weeks as real time passes)

@@ -1212,3 +1212,442 @@ body {
     border-radius: 8px;
 }
 .fic-stat i { width: 16px; height: 16px; }
+/* ─── Mobile Bottom Navigation Bar ───────────────────────────────────────────── */
+.mobile-bottom-nav {
+    display: none; /* Hidden on desktop */
+}
+
+/* ─── Mobile: iPhone 15 Pro, phones, small tablets (≤ 768px) ─────────────────── */
+@media (max-width: 768px) {
+    /* Hide sidebar completely on mobile — replaced by bottom nav */
+    .sidebar {
+        display: none !important;
+    }
+
+    /* Hide the sidebar toggle button */
+    .sidebar-toggle,
+    .sidebar .sidebar-toggle {
+        display: none !important;
+    }
+
+    /* Bottom Tab Bar — iOS/Android style */
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        height: 64px;
+        background: rgba(10, 14, 20, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+        padding: 0 4px;
+        padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone notch safe area */
+    }
+
+    .mob-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-decoration: none;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        padding: 8px 2px;
+        transition: color 0.2s ease;
+        position: relative;
+    }
+
+    .mob-tab i {
+        width: 20px;
+        height: 20px;
+    }
+
+    .mob-tab.active {
+        color: #10b981;
+    }
+
+    .mob-tab.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 2px;
+        background: #10b981;
+        border-radius: 0 0 2px 2px;
+    }
+
+    .mob-tab:active {
+        color: #34d399;
+    }
+
+    /* Main content — full width + bottom padding for nav bar */
+    .main-content {
+        padding: 16px 14px 80px;
+        width: 100%;
+    }
+
+    /* Header */
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+
+    .subtitle {
+        font-size: 13px;
+    }
+
+    .header-right {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .days-active-badge {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 14px;
+    }
+
+    .date-filter {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* Project summary header — stack vertically */
+    .project-summary-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .detail-item {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .detail-divider {
+        display: none;
+    }
+
+    .detail-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .detail-icon i {
+        width: 18px;
+        height: 18px;
+    }
+
+    .detail-label {
+        font-size: 11px;
+    }
+
+    .detail-value {
+        font-size: 14px;
+    }
+
+    /* KPI grid — single column */
+    .kpi-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .kpi-card {
+        padding: 16px;
+        min-height: auto;
+        gap: 12px;
+    }
+
+    .kpi-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .kpi-icon-wrapper i {
+        width: 20px;
+        height: 20px;
+    }
+
+    .kpi-value {
+        font-size: 22px;
+    }
+
+    .kpi-value .unit {
+        font-size: 12px;
+    }
+
+    .kpi-label {
+        font-size: 12px;
+        white-space: normal;
+    }
+
+    .kpi-trend {
+        font-size: 11px;
+    }
+
+    /* Charts grid — single column */
+    .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .chart-card {
+        padding: 16px;
+    }
+
+    .chart-header h3 {
+        font-size: 14px;
+    }
+
+    .main-chart,
+    .side-chart {
+        min-height: 300px;
+    }
+
+    /* Profile grid — single column */
+    .profile-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .profile-panel {
+        padding: 16px;
+    }
+
+    /* Specs list — single column */
+    .specs-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .specs-list li {
+        font-size: 13px;
+        padding: 10px 14px;
+    }
+
+    /* Budget */
+    .budget-stats {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .budget-stats > div:last-child {
+        text-align: left !important;
+    }
+
+    .budget-note {
+        font-size: 12px;
+    }
+
+    /* Gauge */
+    .gauge-svg {
+        max-width: 220px;
+    }
+
+    .gauge-meta-row {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+
+    .gauge-meta-divider {
+        width: 50px;
+        height: 1px;
+    }
+
+    .gauge-meta-label {
+        font-size: 10px;
+    }
+
+    .gauge-meta-value {
+        font-size: 13px;
+    }
+
+    /* Doughnut */
+    .doughnut-container {
+        height: 180px;
+    }
+
+    /* Social targets */
+    .social-targets {
+        gap: 14px;
+    }
+
+    .st-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    /* Ops log */
+    .ops-log {
+        margin-left: 0;
+    }
+
+    .ops-entry {
+        gap: 12px;
+        padding: 10px 0;
+    }
+
+    .ops-title {
+        font-size: 13px;
+    }
+
+    .ops-meta {
+        font-size: 11px;
+    }
+
+    /* Family impact card */
+    .family-impact-card img {
+        height: 160px;
+    }
+
+    .fic-content {
+        padding: 16px;
+    }
+
+    .fic-content h3 {
+        font-size: 1rem;
+    }
+
+    .fic-content p {
+        font-size: 0.85rem;
+    }
+
+    .fic-stats {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fic-stat {
+        font-size: 0.82rem;
+        padding: 5px 10px;
+    }
+
+    /* Hero photo banner */
+    .hero-photo-banner {
+        height: 150px;
+    }
+
+    .hero-photo-overlay {
+        padding: 0 16px;
+    }
+
+    .hero-photo-overlay h2 {
+        font-size: 1.2rem;
+    }
+
+    .hero-photo-overlay p {
+        font-size: 0.85rem;
+    }
+
+    /* Impact tiles (overview page) */
+    .impact-row {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+
+    .impact-tile {
+        padding: 14px;
+    }
+
+    .impact-tile .it-val {
+        font-size: 1.1rem;
+    }
+
+    /* Overview charts */
+    .overview-charts {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .chart-canvas-wrap {
+        height: 220px;
+    }
+
+    /* Target progress */
+    .target-progress {
+        padding: 12px 14px;
+    }
+
+    .tp-title {
+        font-size: 11px;
+    }
+
+    /* Quick links */
+    .quick-links {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+
+    .quick-link {
+        padding: 14px 16px;
+    }
+
+    /* Milestone stepper — scroll horizontally */
+    .milestone-stepper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 8px;
+    }
+
+    .milestone {
+        min-width: 130px;
+    }
+
+    .ms-title {
+        font-size: 13px;
+    }
+
+    .ms-body {
+        padding: 0 4px;
+    }
+
+    /* Badge */
+    .badge-systems {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    /* Net badge */
+    .net-badge {
+        font-size: 0.75rem;
+        padding: 8px 12px;
+    }
+
+    /* Milestone card */
+    .ms-card {
+        padding: 16px;
+    }
+
+    .ms-card h3 {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
